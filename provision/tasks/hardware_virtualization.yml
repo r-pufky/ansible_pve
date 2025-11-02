@@ -7,16 +7,16 @@
 # Reference:
 # * https://r-pufky.github.io/docs/virtualization/hypervisors/pve/index.html#enable-hardware-virtualization-iommu
 
-- name: 'virtualization | enable virtual file IO on boot'
+- name: 'Virtualization | enable virtual file IO on boot'
   ansible.builtin.copy:
-    src:   'etc/modules-load.d/vfio.conf'
-    dest:  '/etc/modules-load.d/vfio.conf'
+    src: 'etc/modules-load.d/vfio.conf'
+    dest: '/etc/modules-load.d/vfio.conf'
     owner: 'root'
     group: 'root'
-    mode:  0644
+    mode: '0644'
     force: true
 
-- name: 'virtualization | determine processor type'
+- name: 'Virtualization | determine processor type'
   ansible.builtin.shell: 'set -o pipefail && grep -m 1 vendor_id /proc/cpuinfo | cut -d : -f 2 | xargs'
   args:
     executable: '/bin/bash'
@@ -25,20 +25,20 @@
 
 # AMD: AuthenticAMD; IOMMU, SVM must be enabled in BIOS
 # Intal: GenuineIntel; IOMMU, VT-d must be enabled in BIOS
-- name: 'virtualization | determine grub line from processor'
+- name: 'Virtualization | determine grub line from processor'
   ansible.builtin.set_fact:
     pve_hardware_virt_grub: "{% if _pve_processor.stdout == 'AuthenticAMD' %}amd_immou{% else %}intel_iommu{% endif %}"
 
-- name: 'virtualization | configure grub for hardware virutalization'
+- name: 'Virtualization | configure grub for hardware virutalization'
   ansible.builtin.template:
-    src:      'grub.j2'
-    dest:     '/etc/default/grub'
-    owner:    'root'
-    group:    'root'
-    mode:     0644
-    force:    true
-    backup:   true
+    src: 'grub.j2'
+    dest: '/etc/default/grub'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+    force: true
+    backup: true
     validate: 'grub-script-check %s'
   notify:
-    - 'update grub'
-    - 'reboot pve'
+    - 'Update grub'
+    - 'Reboot PVE'

@@ -13,12 +13,12 @@
 # * https://pve.proxmox.com/pve-docs/pve-admin-guide.html
 # * https://forum.proxmox.com/threads/kernel-panic-after-resizing-a-clone.93738/
 
-- name: '{{ _pve_vm.vmid }} | start container {{ _pve_vm.config.hostname }}' # noqa no-changed-when always execute
+- name: '{{ _pve_vm.vmid }} | start container {{ _pve_vm.config.hostname }}' # noqa name[template] no-changed-when always execute
   ansible.builtin.command: 'pct start {{ _pve_vm.vmid }}'
   register: _pve_lxc_start
   delegate_to: '{{ _pve_vm.node }}'
 
-- name: '{{ _pve_vm.vmid }} | wait for container to spin up'
+- name: '{{ _pve_vm.vmid }} | wait for container to spin up'  # noqa name[template]
   ansible.builtin.pause:
     seconds: '{{ pve_lxc_start_timeout }}'
     echo: false

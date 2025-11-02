@@ -35,21 +35,21 @@
 # PVE stores config in any order (especially after WebUI interactions) ansible
 # check_mode assumes same order. Write config and confirm that actual changes
 # are detected, not just line shifts.
-- name: '{{ _pve_vm.vmid }} | stage configuration for validation'
+- name: '{{ _pve_vm.vmid }} | stage configuration for validation'  # noqa name[template]
   ansible.builtin.template:
-    src:   'lxc.conf.j2'
-    dest:  '/tmp/lxc.conf'
+    src: 'lxc.conf.j2'
+    dest: '/tmp/lxc.conf'
     force: true
     owner: 'root'
     group: 'www-data'
-    mode:  0644
+    mode: '0644'
   changed_when: false
   delegate_to: '{{ _pve_vm.node }}'
 
 # Diff exit codes:
 #   0: diff files are the same
 #   1: diff files are different
-- name: '{{ _pve_vm.vmid }} | check for configuration changes (ignoring order)'
+- name: '{{ _pve_vm.vmid }} | check for configuration changes (ignoring order)'  # noqa name[template]
   ansible.builtin.shell: 'diff <(sort /tmp/lxc.conf) <(sort /etc/pve/lxc/{{ _pve_vm.vmid }}.conf)'
   args:
     executable: '/bin/bash'
@@ -58,16 +58,16 @@
   failed_when: _pve_vm_config_check.rc > 1
   delegate_to: '{{ _pve_vm.node }}'
 
-- name: 'lxc | configuration changes required'
+- name: 'LXC | configuration changes required'  # noqa name[template]
+  when: _pve_vm_config_check.rc == 1
   block:
     - ansible.builtin.include_tasks: operations/shutdown.yml
     - ansible.builtin.include_tasks: reconfigure.yml
     - ansible.builtin.include_tasks: operations/start.yml
-  when: _pve_vm_config_check.rc == 1
 
-- name: '{{ _pve_vm.vmid }} | cleanup' # noqa ignore-errors ok if missing
+- name: '{{ _pve_vm.vmid }} | cleanup' # noqa name[template] ignore-errors ok if missing
   ansible.builtin.file:
-    path:  '/tmp/lxc.conf'
+    path: '/tmp/lxc.conf'
     state: 'absent'
   changed_when: false
   ignore_errors: true

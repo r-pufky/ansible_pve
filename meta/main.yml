@@ -1,11 +1,11 @@
 ---
 galaxy_info:
-  role_name:   'pve'
-  author:      'r_pufky'
+  role_name: 'pve'
+  author: 'r_pufky'
   description: 'Proxmox (PVE) Cluster Management'
-  company:     'N/A'
-  license:     'AGPL-3.0 License'
-  min_ansible_version: 2.11
+  company: 'N/A'
+  license: 'AGPL-3.0 License'
+  min_ansible_version: '2.11'
 
   platforms:
     - name: 'Debian'

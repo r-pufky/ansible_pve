@@ -14,39 +14,39 @@
 # * https://pve.proxmox.com/pve-docs/pvesh.1.html
 # * https://pve.proxmox.com/pve-docs/pve-admin-guide.html
 
-- name: '{{ _pve_vm.vmid }} iso | processing iso'
+- name: '{{ _pve_vm.vmid }} iso | processing iso'  # noqa name[template]
   ansible.builtin.set_fact:
     _pve_iso_exists: false
 
-- name: '{{ _pve_vm.vmid }} iso | list cluster/node isos'
+- name: '{{ _pve_vm.vmid }} iso | list cluster/node isos'  # noqa name[template]
   ansible.builtin.command: 'pvesh get /nodes/{{ _pve_vm.node.split(".")[0] }}/storage/local/content --output-format json'
   register: _pve_iso_list
   changed_when: false
   delegate_to: '{{ _pve_vm.node }}'
 
-- name: '{{ _pve_vm.vmid }} iso | check if required iso exists on cluster/node'
+- name: '{{ _pve_vm.vmid }} iso | check if required iso exists on cluster/node'  # noqa name[template]
   ansible.builtin.set_fact:
     _pve_iso_exists: true
   when: _pve_vm.template.name == node_iso.volid.split('local:iso/')[-1]
-  loop: '{{ _pve_iso_list.stdout|from_json }}'
+  loop: '{{ _pve_iso_list.stdout | from_json }}'
   loop_control:
     loop_var: node_iso
 
-- name: '{{ _pve_vm.vmid }} iso | downloading (timeout after {{ pve_vm_download_timeout }} seconds)'
+- name: '{{ _pve_vm.vmid }} iso | downloading (timeout after {{ pve_vm_download_timeout }} seconds)'  # noqa name[template]
   ansible.builtin.debug:
     msg: |
       Downloading: {{ _pve_vm.template.file }}
   when: not _pve_iso_exists
 
-- name: '{{ _pve_vm.vmid }} iso | cluster {{ _pve_vm.node }} downloading: {{ _pve_vm.template.file }}'
+- name: '{{ _pve_vm.vmid }} iso | cluster {{ _pve_vm.node }} downloading: {{ _pve_vm.template.file }}'  # noqa name[template]
   ansible.builtin.get_url:
-    url:      '{{ _pve_vm.template.url }}'
-    dest:     '{{ pve_vm_iso_location }}/{{ _pve_vm.template.file }}'
+    url: '{{ _pve_vm.template.url }}'
+    dest: '{{ pve_vm_iso_location }}/{{ _pve_vm.template.file }}'
     checksum: '{{ _pve_vm.template.algorithm }}:{{ _pve_vm.template.checksum }}'
-    timeout:  '{{ pve_vm_download_timeout }}'
-    owner:    'root'
-    group:    'root'
-    mode:     0644
+    timeout: '{{ pve_vm_download_timeout }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
   delegate_to: '{{ _pve_vm.node }}'
   when: not _pve_iso_exists
 

@@ -15,17 +15,17 @@
 # Reference:
 # * https://pve.proxmox.com/pve-docs/qm.1.html
 
-- name: '{{ _pve_vm.vmid }} | initialize cloud init settings'
+- name: '{{ _pve_vm.vmid }} | initialize cloud init settings'  # noqa name[template]
+  when: _pve_vm.cloud_init|length > 0
   block:
     - ansible.builtin.include_tasks: cloud_init/custom_settings.yml
     - ansible.builtin.include_tasks: cloud_init/create_image.yml
     - ansible.builtin.include_tasks: cloud_init/extract_image.yml
-  when: _pve_vm.cloud_init|length > 0
 
 # TODO(role): see qm.conf. There are image options to auto create a new volume
 #             https://pve.proxmox.com/wiki/Manual:_qm.conf -> ide, scsi, etc.
 #             for file. These are parsed as _pve_vm.root.meta.create
-- name: '{{ _pve_vm.vmid }} create | new bare vm' # noqa no-changed-when always execute
+- name: '{{ _pve_vm.vmid }} create | new bare vm' # noqa name[template] no-changed-when always execute
   ansible.builtin.command: 'qm create {{ _pve_vm.vmid }} --memory {{ _pve_vm.config.memory }}'
   delegate_to: '{{ _pve_vm.node }}'
 

@@ -21,6 +21,7 @@
   register: _pve_quorum
 
 - name: 'global task | no quorum reached'
+  when: _pve_quorum.rc != 0
   ansible.builtin.fail:
     msg: |
       No Quorum has been reached. Cannot make cluster changes. Cluster must be
@@ -28,4 +29,3 @@
       See: roles/pve/provision/tasks/main.yml
 
       https://forum.proxmox.com/threads/unable-to-modify-anything-under-etc-pve.10284/
-  when: _pve_quorum.rc != 0

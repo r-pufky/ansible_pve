@@ -10,14 +10,14 @@
 # * https://pve.proxmox.com/wiki/Ports
 
 ports:
-  - {proto: 'tcp', from_ip: '+management', to_port: 8006,        direction: 'in', comment: 'WebUI'}
-  - {proto: 'tcp', from_ip: 'any',         to_port: 5900:5999,   direction: 'in', comment: 'VNC web console websockets'}
-  - {proto: 'tcp', from_ip: 'any',         to_port: 3128,        direction: 'in', comment: 'spice proxy (client remote viewer)'}
-  - {proto: 'tcp', from_ip: '+management', to_port: 22,          direction: 'in', comment: 'SSH (management traffic)'}
-  - {proto: 'tcp', from_ip: '+cluster',    to_port: 22,          direction: 'in', comment: 'SSH (cluster backend traffic)'}
-  - {proto: 'udp', from_ip: 'any',         to_port: 111,         direction: 'in', comment: 'rpcbind (NFS services)'}
-  - {proto: 'tcp', from_ip: 'any',         to_port: 111,         direction: 'in', comment: 'rpcbind (NFS services)'}
-  - {proto: 'udp', from_ip: '+cluster',    to_port: 5404:5412,   direction: 'in', comment: 'Corosync cluster traffic'}
-  - {proto: 'tcp', from_ip: '+cluster',    to_port: 60000:60050, direction: 'in', comment: 'live migrations'}
-  - {proto: 'tcp', from_ip: '+cluster',    to_port: 85,          direction: 'in', comment: 'pvedaemon (listens 127.0.0.1:85) for REST API access'}
-  - {proto: 'tcp', from_ip: '+cluster',    to_port: 25,          direction: 'out', comment: 'sendmail'}
+  - {proto: 'tcp', from_ip: '+management', to_port: 8006, direction: 'in', comment: 'WebUI'}
+  - {proto: 'tcp', from_ip: 'any', to_port: '5900:5999', direction: 'in', comment: 'VNC web console websockets'}
+  - {proto: 'tcp', from_ip: 'any', to_port: 3128, direction: 'in', comment: 'spice proxy (client remote viewer)'}
+  - {proto: 'tcp', from_ip: '+management', to_port: 22, direction: 'in', comment: 'SSH (management traffic)'}
+  - {proto: 'tcp', from_ip: '+cluster', to_port: 22, direction: 'in', comment: 'SSH (cluster backend traffic)'}
+  - {proto: 'udp', from_ip: 'any', to_port: 111, direction: 'in', comment: 'rpcbind (NFS services)'}
+  - {proto: 'tcp', from_ip: 'any', to_port: 111, direction: 'in', comment: 'rpcbind (NFS services)'}
+  - {proto: 'udp', from_ip: '+cluster', to_port: '5404:5412', direction: 'in', comment: 'Corosync cluster traffic'}
+  - {proto: 'tcp', from_ip: '+cluster', to_port: '60000:60050', direction: 'in', comment: 'live migrations'}
+  - {proto: 'tcp', from_ip: '+cluster', to_port: 85, direction: 'in', comment: 'pvedaemon (listens 127.0.0.1:85) for REST API access'}
+  - {proto: 'tcp', from_ip: '+cluster', to_port: 25, direction: 'out', comment: 'sendmail'}

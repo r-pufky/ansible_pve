@@ -1,8 +1,8 @@
 ---
 pve_kvm:
-  vmid:       251
-  node:       'pm3.example.com'
-  template:   'debian-bullseye-cloudinit-xz'
+  vmid: 251
+  node: 'pm3.example.com'
+  template: 'debian-bullseye-cloudinit-xz'
   force_stop: true
   cloud_init: 'local-lvm'
   config: |

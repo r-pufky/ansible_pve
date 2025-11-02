@@ -23,12 +23,12 @@
 # * https://r-pufky.github.io/docs/virtualization/hypervisors/pve/index.html#firewall
 # * https://r-pufky.github.io/docs/virtualization/hypervisors/pve/index.html#ports
 
-- name: 'firewall | create datacenter directory' # noqa risky-file-permissions pmxcfs managed
+- name: 'Firewall | create datacenter directory' # noqa risky-file-permissions pmxcfs managed
   ansible.builtin.file:
     dest:  '/etc/pve/firewall'
     state: 'directory'
 
-- name: 'firewall | check for datacenter changes' # noqa risky-file-permissions pmxcfs managed
+- name: 'Firewall | check for datacenter changes' # noqa risky-file-permissions pmxcfs managed
   ansible.builtin.template:
     src:   'cluster.fw.j2'
     dest:  '/etc/pve/firewall/cluster.fw'
@@ -36,21 +36,22 @@
   check_mode: true
   register: _pve_dc_firewall_check
 
-- name: 'firewall | stage datacenter changes' # noqa no-handler conditional
+- name: 'Firewall | stage datacenter changes' # noqa no-handler conditional
+  when: _pve_dc_firewall_check.changed
   ansible.builtin.template:
     src:   'cluster.fw.j2'
     dest:  '/tmp/cluster.fw'
     owner: 'root'
     group: 'www-data'
-    mode:  0640
+    mode: '0640'
     force: true
-  when: _pve_dc_firewall_check.changed
 
-- name: 'firewall | apply datacenter changes to pmxcfs' # noqa no-handler execute immediately
+- name: 'Firewall | apply datacenter changes to pmxcfs' # noqa no-handler execute immediately
   ansible.builtin.command: 'mv /tmp/cluster.fw /etc/pve/firewall/cluster.fw'
   when: _pve_dc_firewall_check.changed
+  changed_when: false
 
-- name: 'firewall | check for cluster host changes'
+- name: 'Firewall | check for cluster host changes'
   ansible.builtin.include_tasks: dc_host_firewall.yml
   loop: '{{ groups.pve_nodes }}'
   loop_control:

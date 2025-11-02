@@ -12,6 +12,6 @@
 # * https://pve.proxmox.com/pve-docs/qm.1.html
 # * https://pve.proxmox.com/pve-docs/pve-admin-guide.html
 
-- name: '{{ _pve_vm.vmid }} disk | rescan cluster disk metadata' # noqa no-changed-when always execute
+- name: '{{ _pve_vm.vmid }} disk | rescan cluster disk metadata' # noqa name[template] no-changed-when always execute
   ansible.builtin.command: 'qm rescan'
   delegate_to: '{{ _pve_vm.node }}'

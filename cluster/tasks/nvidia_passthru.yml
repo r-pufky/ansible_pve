@@ -19,37 +19,37 @@
 # * https://pve.proxmox.com/pve-docs/pve-admin-guide.html
 # * https://wiki.debian.org/NvidiaGraphicsDrivers
 
-- name: 'packages | add GPU passthru repositories'
+- name: 'Packages | add GPU passthru repositories'
+  when: pve_nvidia_passthru
   block:
-    - name: 'packages | add non-free (for GPU passthrough support) repo'
+    - name: 'Packages | add non-free (for GPU passthrough support) repo'
       ansible.builtin.apt_repository:
-        repo:     '{{ item }}'
+        repo: '{{ item }}'
         filename: 'debian_core'
-        state:    'present'
+        state: 'present'
         update_cache: true
       loop:
         - 'deb http://ftp.us.debian.org/debian {{ pve_debian_base }} main contrib non-free'
         - 'deb http://ftp.us.debian.org/debian {{ pve_debian_base }}-updates main contrib non-free'
         - 'deb http://security.debian.org {{ pve_debian_base }}-security main contrib non-free'
 
-    - name: 'packages | remove original apt sources'
+    - name: 'Packages | remove original apt sources'
       ansible.builtin.apt_repository:
-        repo:  '{{ item }}'
+        repo: '{{ item }}'
         state: 'absent'
         update_cache: true
       loop:
         - 'deb http://ftp.us.debian.org/debian {{ pve_debian_base }} main contrib'
         - 'deb http://ftp.us.debian.org/debian {{ pve_debian_base }}-updates main contrib'
         - 'deb http://security.debian.org {{ pve_debian_base }}-security main contrib'
-  when: pve_nvidia_passthru
 
-- name: 'passthru | install pve headers'
+- name: 'Passthru | install pve headers'
   ansible.builtin.apt:
-    name:  'pve-headers'
+    name: 'pve-headers'
     state: 'latest'
     update_cache: true
 
-- name: 'passthru | detect GPU hardware'
+- name: 'Passthru | detect GPU hardware'
   ansible.builtin.shell: 'set -o pipefail && lspci | grep -i nvidia'
   args:
     executable: '/bin/bash'
@@ -57,24 +57,24 @@
   changed_when: false
   failed_when: _pve_gpu_detect.rc != 0
 
-- name: 'passthru | Enable backports for Nvidia GPUs'
+- name: 'Passthru | Enable backports for Nvidia GPUs'
+  when: pve_debian_base|length > 0
   block:
-
-    - name: 'passthru | add debian backports for nvidia support'
+    - name: 'Passthru | add debian backports for nvidia support'
       ansible.builtin.apt_repository:
-        repo:     'deb http://deb.debian.org/debian {{ pve_debian_base }}-backports main contrib non-free'
+        repo: 'deb http://deb.debian.org/debian {{ pve_debian_base }}-backports main contrib non-free'
         filename: 'backports'
-        state:    'present'
+        state: 'present'
         update_cache: true
 
-    - name: 'passthru | add debian source backports for nvidia support'
+    - name: 'Passthru | add debian source backports for nvidia support'
       ansible.builtin.apt_repository:
-        repo:     'deb http://deb.debian.org/debian {{ pve_debian_base }}-backports main contrib non-free'
+        repo: 'deb http://deb.debian.org/debian {{ pve_debian_base }}-backports main contrib non-free'
         filename: 'backports_source'
-        state:    'present'
+        state: 'present'
         update_cache: true
 
-    - name: 'passthru | install nivida drivers from backports'
+    - name: 'Passthru | install nivida drivers from backports'
       ansible.builtin.apt:
         name:
           - 'nvidia-driver={{ pve_nvidia_driver }}*'
@@ -84,9 +84,7 @@
         state: 'present'
       register: _pve_gpu_host_driver
 
-  when: pve_debian_base|length > 0
-
-- name: 'passthru | install nvidia drivers'
+- name: 'Passthru | install nvidia drivers'
   ansible.builtin.apt:
     name:
       - 'nvidia-driver={{ pve_nvidia_driver }}*'
@@ -96,27 +94,27 @@
   register: _pve_gpu_host_driver
   when: pve_debian_base|length == 0
 
-- name: 'passthru | enable nvidia drivers on boot'
+- name: 'Passthru | enable nvidia drivers on boot'
   ansible.builtin.copy:
-    src:   'etc/modules-load.d/nvidia.conf'
-    dest:  '/etc/modules-load.d/nvidia.conf'
+    src: 'etc/modules-load.d/nvidia.conf'
+    dest: '/etc/modules-load.d/nvidia.conf'
     owner: 'root'
     group: 'root'
-    mode:  0644
+    mode: '0644'
     force: true
   register: _pve_gpu_host_modules
 
-- name: 'passthru | add nvidia udev rules to populate /dev'
+- name: 'Passthru | add nvidia udev rules to populate /dev'
   ansible.builtin.copy:
-    src:   'etc/udev/rules.d/70-nvidia.rules'
-    dest:  '/etc/udev/rules.d/70-nvidia.rules'
+    src: 'etc/udev/rules.d/70-nvidia.rules'
+    dest: '/etc/udev/rules.d/70-nvidia.rules'
     owner: 'root'
     group: 'root'
-    mode:  0644
+    mode: '0644'
     force: true
   register: _pve_gpu_host_udev
 
-- name: 'passthru | rebooting to enable host-passthru' # noqa no-handler execute immediately
+- name: 'Passthru | rebooting to enable host-passthru' # noqa no-handler execute immediately
   ansible.builtin.reboot:
     reboot_timeout: 3600
   when: |
@@ -124,7 +122,7 @@
     _pve_gpu_host_modules.changed or
     _pve_gpu_host_udev.changed
 
-- name: 'passthru | verify nvidia drivers are loaded'
+- name: 'Passthru | verify nvidia drivers are loaded'
   ansible.builtin.command: 'nvidia-smi'
   register: _pve_gpu_host_validate
   changed_when: false
@@ -132,7 +130,7 @@
 
 # Get the device IDs from /dev/dri/* and /dev/nvidia* (5th column).
 # https://passbe.com/2020/02/19/gpu-nvidia-passthrough-on-proxmox-lxc-container/
-- name: 'passthru | determine passthru device IDs'
+- name: 'Passthru | determine passthru device IDs'
   ansible.builtin.shell: |
     set -o pipefail && find /dev/dri/ /dev/nvidia* -type c | xargs ls -lA | awk '{ print $5 }' | sed '/^$/d' | sed 's/,*$//g' | sort | uniq | awk '{ print "lxc.cgroup2.devices.allow: c "$1":* rwm" }'
   args:
@@ -140,14 +138,14 @@
   register: _pve_gpu_host_dev
   changed_when: false
 
-- name: 'passthru | determine passthru character devices'
+- name: 'Passthru | determine passthru character devices'
   ansible.builtin.shell: "set -o pipefail && find /dev/nvidia* -type c ! -name nvidia-cap* | awk '{ print \"lxc.mount.entry: \"$1\" \"$1\" none bind,optional,create=file\" }'"
   args:
     executable: '/bin/bash'
   register: _pve_gpu_host_cdev
   changed_when: false
 
-- name: 'passthru | NVIDIA GPU DEVICE ID PASSTHRU (add to container)'
+- name: 'Passthru | NVIDIA GPU DEVICE ID PASSTHRU (add to container)'
   ansible.builtin.debug:
     msg: |
       Autogenerated LXC config suggestion:

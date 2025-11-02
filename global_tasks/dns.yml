@@ -12,30 +12,30 @@
 # * https://mangolassi.it/topic/21764/configuring-network-settings-for-proxmox-installs/2
 # * https://r-pufky.github.io/docs/virtualization/hypervisors/pve/index.html#setup-networking
 
-
 - name: 'global task | configure cluster DNS'
+  when: pve_dns|length > 0
   block:
     - name: 'global task | check cluster DNS'
       ansible.builtin.template:
-        src:   'resolv.conf.j2'
-        dest:  '/etc/resolv.conf'
+        src: 'resolv.conf.j2'
+        dest: '/etc/resolv.conf'
         owner: 'root'
         group: 'root'
-        mode:  0644
+        mode: '0644'
         force: true
       check_mode: true
       register: _pve_dns_check
 
     - name: 'global tasks | set cluster DNS' # noqa no-handler conditional
       ansible.builtin.template:
-        src:   'resolv.conf.j2'
-        dest:  '/etc/resolv.conf'
+        src: 'resolv.conf.j2'
+        dest: '/etc/resolv.conf'
         owner: 'root'
         group: 'root'
-        mode:  0644
+        mode: '0644'
         force: true
       when: _pve_dns_check.changed
-      notify: 'reboot pve'
+      notify: 'Reboot PVE'
 
     - name: 'global task | restarting node (may take a while)'
       ansible.builtin.debug:
@@ -44,5 +44,3 @@
 
           This will take a few minutes.
       when: _pve_dns_check.changed
-
-  when: pve_dns|length > 0

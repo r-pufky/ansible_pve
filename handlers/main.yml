@@ -4,14 +4,14 @@
 ###############################################################################
 # Global proxmox handlers.
 
-- name: 'restart pveproxy'
+- name: 'Restart pveproxy'
   ansible.builtin.service:
     name:  'pveproxy'
     state: 'restarted'
 
-- name: 'update grub'
+- name: 'Update grub'
   ansible.builtin.command: 'update-grub'
   changed_when: false
 
-- name: 'reboot pve'
+- name: 'Reboot PVE'
   ansible.builtin.reboot:

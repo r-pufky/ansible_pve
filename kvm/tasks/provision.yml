@@ -35,14 +35,14 @@
 # PVE stores config in any order (especially after WebUI interactions) ansible
 # check_mode assumes same order. Write config and confirm that actual changes
 # are detected, not just line shifts.
-- name: '{{ _pve_vm.vmid }} | stage configuration for validation'
+- name: '{{ _pve_vm.vmid }} | stage configuration for validation'  # noqa name[template]
   ansible.builtin.template:
-    src:   'file.template.j2'
-    dest:  '/tmp/kvm.conf'
+    src: 'file.template.j2'
+    dest: '/tmp/kvm.conf'
     force: true
     owner: 'root'
     group: 'www-data'
-    mode:  0640
+    mode: '0640'
   vars:
     file_contents: '{{ _pve_vm.config_list }}'
   changed_when: false
@@ -58,8 +58,8 @@
 # Diff exit codes:
 #   0: diff files are the same
 #   1: diff files are different
-- name: '{{ _pve_vm.vmid }} | check for configuration changes (ignoring order)'
-  ansible.builtin.shell: 'set -o pipefail && diff  <(grep -v "^meta" /tmp/kvm.conf | grep -v "^{{ _pve_vm.cloud_init.mountpoint|default(omit) }}" | sort) <(grep -v "^meta" /etc/pve/qemu-server/{{ _pve_vm.vmid }}.conf | grep -v "^{{ _pve_vm.cloud_init.mountpoint|default(omit) }}" | sort)'
+- name: '{{ _pve_vm.vmid }} | check for configuration changes (ignoring order)'  # noqa name[template]
+  ansible.builtin.shell: 'set -o pipefail && diff  <(grep -v "^meta" /tmp/kvm.conf | grep -v "^{{ _pve_vm.cloud_init.mountpoint | default(omit) }}" | sort) <(grep -v "^meta" /etc/pve/qemu-server/{{ _pve_vm.vmid }}.conf | grep -v "^{{ _pve_vm.cloud_init.mountpoint | default(omit) }}" | sort)'
   args:
     executable: '/bin/bash'
   register: _pve_vm_config_check
@@ -67,16 +67,16 @@
   failed_when: _pve_vm_config_check.rc > 1
   delegate_to: '{{ _pve_vm.node }}'
 
-- name: 'kvm | configuration changes required'
+- name: 'KVM | configuration changes required'
+  when: _pve_vm_config_check.rc == 1
   block:
     - ansible.builtin.include_tasks: operations/shutdown.yml
     - ansible.builtin.include_tasks: reconfigure.yml
     - ansible.builtin.include_tasks: operations/start.yml
-  when: _pve_vm_config_check.rc == 1
 
-- name: '{{ _pve_vm.vmid }} | cleanup' # noqa ignore-errors ok if missing
+- name: '{{ _pve_vm.vmid }} | cleanup' # noqa name[template] ignore-errors ok if missing
   ansible.builtin.file:
-    path:  '/tmp/kvm.conf'
+    path: '/tmp/kvm.conf'
     state: 'absent'
   changed_when: false
   ignore_errors: true

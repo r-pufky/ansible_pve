@@ -9,6 +9,6 @@
   when: pve_nvidia_passthru
 - ansible.builtin.include_tasks: cron.yml
   vars:
-    name:   '{{ item.key }}'
+    job: '{{ item.key }}'
     config: '{{ item.value }}'
-  loop: '{{ pve_cron|default({})|dict2items }}'
+  loop: '{{ pve_cron | default({}) | dict2items }}'

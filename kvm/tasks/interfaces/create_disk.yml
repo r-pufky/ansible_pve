@@ -18,21 +18,21 @@
 # * https://pve.proxmox.com/pve-docs/pvesh.1.html
 # * https://pve.proxmox.com/pve-docs/pve-admin-guide.html
 
-- name: '{{ _pve_vm.vmid }} disk | processing disk {{ disk.fullname }}'
+- name: '{{ _pve_vm.vmid }} disk | processing disk {{ disk.fullname }}'  # noqa name[template]
   ansible.builtin.set_fact:
     _pve_disk_exists: false
 
-- name: '{{ _pve_vm.vmid }} disk | list cluster/node disks on {{ disk.storage }}'
+- name: '{{ _pve_vm.vmid }} disk | list cluster/node disks on {{ disk.storage }}'  # noqa name[template]
   ansible.builtin.command: 'pvesh get /nodes/{{ _pve_vm.node.split(".")[0] }}/storage/{{ disk.storage }}/content --output-format json'
   register: _pve_disk_list
   changed_when: false
   delegate_to: '{{ _pve_vm.node }}'
 
-- name: '{{ _pve_vm.vmid }} disk | check if {{ disk.fullname }} exists on cluster/node/{{ disk.storage }}'
+- name: '{{ _pve_vm.vmid }} disk | check if {{ disk.fullname }} exists on cluster/node/{{ disk.storage }}'  # noqa name[template]
   ansible.builtin.set_fact:
     _pve_disk_exists: true
   when: disk.file == node_disk.volid
-  loop: '{{ _pve_disk_list.stdout|from_json }}'
+  loop: '{{ _pve_disk_list.stdout | from_json }}'
   loop_control:
     loop_var: node_disk
 
@@ -42,7 +42,7 @@
     size: '{{ disk.size }}'
   when: _pve_disk_exists
 
-- name: '{{ _pve_vm.vmid }} disk | creating disk {{ disk.name }}.{{ disk.format }}'
+- name: '{{ _pve_vm.vmid }} disk | creating disk {{ disk.name }}.{{ disk.format }}'  # noqa name[template]
   ansible.builtin.command: 'pvesm alloc {{ disk.storage }} {{ _pve_vm.vmid }} {{ disk.fullname }} {{ disk.size }} -format {{ disk.format }}'
   register: _pve_store_list
   changed_when: false
@@ -50,7 +50,7 @@
   when: disk.format|length > 0 and not _pve_disk_exists
   delegate_to: '{{ _pve_vm.node }}'
 
-- name: '{{ _pve_vm.vmid }} disk | creating disk {{ disk.name }}'
+- name: '{{ _pve_vm.vmid }} disk | creating disk {{ disk.name }}'  # noqa name[template]
   ansible.builtin.command: 'pvesm alloc {{ disk.storage }} {{ _pve_vm.vmid }} {{ disk.fullname }} {{ disk.size }}'
   register: _pve_store_list
   changed_when: false

@@ -28,13 +28,13 @@
 # * https://forum.proxmox.com/threads/kernel-panic-after-resizing-a-clone.93738/
 # * https://pve.proxmox.com/wiki/Resize_disks
 
-- name: '{{ _pve_vm.vmid }} | resize disk {{ mountpoint }} if needed' # noqa no-changed-when always execute
+- name: '{{ _pve_vm.vmid }} | resize disk {{ mountpoint }} if needed' # noqa name[template] no-changed-when always execute
   ansible.builtin.command: 'qm resize {{ _pve_vm.vmid }} {{ mountpoint }} {{ size }}'
   register: _pve_resize
   failed_when: _pve_resize.rc not in (0, 255)
   delegate_to: '{{ _pve_vm.node }}'
 
-- name: '{{ _pve_vm.vmid }} | flagging resize'
+- name: '{{ _pve_vm.vmid }} | flagging resize'  # noqa name[template]
+  when: _pve_resize.rc == 0
   ansible.builtin.set_fact:
     _pve_vm_disk_resize: true
-  when: _pve_resize.rc == 0

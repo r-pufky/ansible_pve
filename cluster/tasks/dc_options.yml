@@ -18,24 +18,25 @@
 # * https://pve.proxmox.com/pve-docs/chapter-pmxcfs.html
 # * https://forum.proxmox.com/threads/unable-to-modify-anything-under-etc-pve.10284/
 
-- name: 'datacenter | check cluster/dc site options for changes' # noqa risky-file-permissions pmxcfs managed
+- name: 'Datacenter | check cluster/dc site options for changes' # noqa risky-file-permissions pmxcfs managed
   ansible.builtin.template:
-    src:   'datacenter.cfg.j2'
-    dest:  '/etc/pve/datacenter.cfg'
+    src: 'Datacenter.cfg.j2'
+    dest: '/etc/pve/datacenter.cfg'
     force: true
   check_mode: true
   register: _pve_dc_options_check
 
-- name: 'datacenter | write cluster/dc site options changes' # noqa no-handler conditional
+- name: 'Datacenter | write cluster/dc site options changes' # noqa no-handler conditional
+  when: _pve_dc_options_check.changed
   ansible.builtin.template:
-    src:   'datacenter.cfg.j2'
-    dest:  '/tmp/datacenter.cfg'
+    src: 'Datacenter.cfg.j2'
+    dest: '/tmp/datacenter.cfg'
     owner: 'root'
     group: 'www-data'
-    mode:  0640
+    mode: '0640'
     force: true
-  when: _pve_dc_options_check.changed
 
-- name: 'datacenter | apply cluster/dc site options changes to pmxcfs' # noqa no-handler execute immediately
-  ansible.builtin.command: 'mv /tmp/datacenter.cfg /etc/pve/datacenter.cfg'
+- name: 'Datacenter | apply cluster/dc site options changes to pmxcfs' # noqa no-handler execute immediately
   when: _pve_dc_options_check.changed
+  ansible.builtin.command: 'mv /tmp/datacenter.cfg /etc/pve/datacenter.cfg'
+  changed_when: false

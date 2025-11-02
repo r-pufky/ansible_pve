@@ -14,37 +14,40 @@
 # * https://github.com/Jamesits/pve-fake-subscription
 # * https://r-pufky.github.io/docs/virtualization/hypervisors/pve/index.html#disable-via-service
 
-- name: 'subscription | disable subscription key validation'
+- name: 'Subscription | disable subscription key validation'
   ansible.builtin.lineinfile:
-    path:   '/etc/hosts'
-    line:   '127.0.0.1 shop.maurer-it.com'
+    path: '/etc/hosts'
+    line: '127.0.0.1 shop.maurer-it.com'
     create: true
-    mode:   0644
-    state:  'present'
+    mode: '0644'
+    state: 'present'
 
-- name: 'subscription | get release metadata'
+- name: 'Subscription | get release metadata'
   ansible.builtin.uri:
     url: 'https://api.github.com/repos/Jamesits/pve-fake-subscription/releases/latest'
-    method:         GET
+    method: 'GET'
     return_content: true
-    status_code:    200
-    body_format:    json
+    status_code: 200
+    body_format: 'json'
   register: _pve_subscription_metadata
 
-- name: 'subscription | find package name'
+- name: 'Subscription | find package name'
   ansible.builtin.set_fact:
-    _pve_subscription_target:  '{{ _pve_subscription_metadata.json.tag_name[1:] }}'
+    _pve_subscription_target: '{{ _pve_subscription_metadata.json.tag_name[1:] }}'
     _pve_subscription_package: '{{ item.name }}'
-    _pve_subscription_url:     '{{ item.browser_download_url }}'
+    _pve_subscription_url: '{{ item.browser_download_url }}'
   loop: '{{ _pve_subscription_metadata.json.assets }}'
   when: '".deb" in item.name'
 
-- name: 'subscription | determine installed package version'
+- name: 'Subscription | determine installed package version'
   ansible.builtin.package_facts:
   no_log: true # all installed system packages.
 
 # Package will autoatically be upgraded if newer version install attempted.
-- name: 'subscription | install {{ _pve_subscription_target }}'
+- name: 'Subscription | install {{ _pve_subscription_target }}'
+  when: |
+    not 'pve-fake-subscription' in ansible_facts.packages or
+    not _pve_subscription_target in ansible_facts.packages['pve-fake-subscription'][0]['version']
   ansible.builtin.apt:
     deb: '{{ _pve_subscription_url }}'
   become: true
@@ -52,6 +55,3 @@
   until: _pve_subscription_download is succeeded
   retries: 5
   delay: 2
-  when: |
-    not 'pve-fake-subscription' in ansible_facts.packages or
-    not _pve_subscription_target in ansible_facts.packages['pve-fake-subscription'][0]['version']

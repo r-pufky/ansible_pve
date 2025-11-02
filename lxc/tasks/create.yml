@@ -15,18 +15,18 @@
 # * https://pve.proxmox.com/pve-docs/pct.1.html
 # * https://pve.proxmox.com/wiki/Unprivileged_LXC_containers
 
-- name: '{{ _pve_vm.vmid }} | download template: {{ _pve_vm.template.file }} to {{ _pve_vm.node }}' # noqa no-changed-when always execute
+- name: '{{ _pve_vm.vmid }} | download template: {{ _pve_vm.template.file }} to {{ _pve_vm.node }}'  # noqa name[template] no-changed-when always execute
   ansible.builtin.shell: 'pveam update && pveam download local {{ _pve_vm.template.file }}'
   delegate_to: '{{ _pve_vm.node }}'
 
-- name: '{{ _pve_vm.vmid }} | write ssh public keys'
+- name: '{{ _pve_vm.vmid }} | write ssh public keys'  # noqa name[template]
   ansible.builtin.copy:
-    dest:    '/tmp/ssh_public_keys'
+    dest: '/tmp/ssh_public_keys'
     content: '{{ pve_vm_ssh_public_key }}'
-    force:   true
-    owner:   'root'
-    group:   'root'
-    mode:    0640
+    force: true
+    owner: 'root'
+    group: 'root'
+    mode: '0640'
   delegate_to: '{{ _pve_vm.node }}'
 
 - ansible.builtin.include_tasks: operations/map_ids.yml
@@ -34,7 +34,7 @@
 # Create will automatically create container volume using {STORAGE}:{SIZE}
 # Reference: https://forum.proxmox.com/threads/change-lxc-from-unprivileged-back-to-privileged.65552/
 # container priviledge needs to be set on creation time (completely different set of files used)
-- name: '{{ _pve_vm.vmid }} | creating new container {{ _pve_vm.vmid }}/{{ _pve_vm.config.hostname }} from {{ _pve_vm.template.file }}' # noqa no-changed-when always execute
+- name: '{{ _pve_vm.vmid }} | creating new container {{ _pve_vm.vmid }}/{{ _pve_vm.config.hostname }} from {{ _pve_vm.template.file }}' # noqa name[template] no-changed-when always execute
   ansible.builtin.command: 'pct create {{ _pve_vm.vmid }} local:vztmpl/{{ _pve_vm.template.file }} --rootfs {{ _pve_vm.root.meta.create }} --ssh-public-keys /tmp/ssh_public_keys --password {{ pve_vm_initial_password }} --unprivileged {{ _pve_vm.config.unprivileged }}'
   delegate_to: '{{ _pve_vm.node }}'
   no_log: true # user password

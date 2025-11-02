@@ -13,13 +13,13 @@
 # * https://pve.proxmox.com/pve-docs/qm.1.html
 # * https://pve.proxmox.com/pve-docs/pve-admin-guide.html
 
-- name: '{{ _pve_vm.vmid }} | force shutdown if enabled and shutdown fails'
+- name: '{{ _pve_vm.vmid }} | force shutdown if enabled and shutdown fails'  # noqa name[template]
   block:
-    - name: '{{ _pve_vm.vmid }} | shutdown vm for configuration updates (timeout after {{ pve_kvm_shutdown_timeout }} seconds)'
+    - name: '{{ _pve_vm.vmid }} | shutdown vm for configuration updates (timeout after {{ pve_kvm_shutdown_timeout }} seconds)'  # noqa name[template] no-changed-when
       ansible.builtin.command: 'qm shutdown {{ _pve_vm.vmid }} --timeout {{ pve_kvm_shutdown_timeout }}'
       delegate_to: '{{ _pve_vm.node }}'
   rescue:
-    - name: '{{ _pve_vm.vmid }} | forcing shutdown vm for configuration updates (timeout after {{ pve_kvm_shutdown_timeout }} seconds)'
-      ansible.builtin.command: 'qm shutdown {{ _pve_vm.vmid }} --forceStop 1 --timeout {{ pve_kvm_shutdown_timeout }}'
+    - name: '{{ _pve_vm.vmid }} | forcing shutdown vm for configuration updates (timeout after {{ pve_kvm_shutdown_timeout }} seconds)'  # noqa name[template] no-changed-when
       when: _pve_vm.force_stop
+      ansible.builtin.command: 'qm shutdown {{ _pve_vm.vmid }} --forceStop 1 --timeout {{ pve_kvm_shutdown_timeout }}'
       delegate_to: '{{ _pve_vm.node }}'

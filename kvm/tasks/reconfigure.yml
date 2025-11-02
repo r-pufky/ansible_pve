@@ -34,29 +34,30 @@
 # * https://forum.proxmox.com/threads/pve-7-0-all-vms-with-cloud-init-seabios-fail-during-boot-process-bootloop-disk-not-found.97310/page-2
 
 # mv preserves permissions (not allowed on pmxcfs). cp & rm instead.
-- name: '{{ _pve_vm.vmid }} | apply configuration changes' # noqa no-changed-when always execute
+- name: '{{ _pve_vm.vmid }} | apply configuration changes' # noqa name[template] no-changed-when always execute
   ansible.builtin.shell: 'cp /tmp/kvm.conf /etc/pve/qemu-server/{{ _pve_vm.vmid }}.conf && rm /tmp/kvm.conf'
   delegate_to: '{{ _pve_vm.node }}'
 
 - ansible.builtin.include_tasks: interfaces/create_disk.yml
+  when: _pve_vm.disks|length > 0
   vars:
     disk: '{{ item }}'
   loop: '{{ _pve_vm.disks }}'
-  when: _pve_vm.disks|length > 0
 
 - ansible.builtin.include_tasks: interfaces/create_iso.yml
+  when: _pve_vm.isos|length > 0
   vars:
     iso: '{{ item }}'
   loop: '{{ _pve_vm.isos }}'
-  when: _pve_vm.isos|length > 0
 
-#- ansible.builtin.include_tasks: cloud_init/ssh_keys.yml
-#  when: _pve_vm.cloud_init|length > 0
+# - ansible.builtin.include_tasks: cloud_init/ssh_keys.yml
+#   when: _pve_vm.cloud_init|length > 0
 
 # Cannot remount the disk if it is already mounted;
-- name: '{{ _pve_vm.vmid }} | mount cloudinit settings on {{ _pve_vm.cloud_init.mountpoint }}'
+- name: '{{ _pve_vm.vmid }} | mount cloudinit settings on {{ _pve_vm.cloud_init.mountpoint }}'  # noqa name[template]
+  when: _pve_vm.cloud_init|length > 0
   ansible.builtin.command: 'qm set {{ _pve_vm.vmid }} --{{ _pve_vm.cloud_init.mountpoint }} {{ _pve_vm.cloud_init.storage }}:cloudinit'
   register: _pve_cloud_init_results
   failed_when: _pve_cloud_init_results.rc not in (0, 5)
+  changed_when: false
   delegate_to: '{{ _pve_vm.node }}'
-  when: _pve_vm.cloud_init|length > 0

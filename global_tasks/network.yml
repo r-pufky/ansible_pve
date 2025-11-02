@@ -17,28 +17,29 @@
 # * https://pve.proxmox.com/pve-docs/pve-admin-guide.html#sysadmin_network_configuration
 
 - name: 'global task | configure cluster network'
+  when: pve_interfaces|length > 0
   block:
     - name: 'global task | check cluster network'
       ansible.builtin.template:
-        src:   'interfaces.j2'
-        dest:  '/etc/network/interfaces'
+        src: 'interfaces.j2'
+        dest: '/etc/network/interfaces'
         owner: 'root'
         group: 'root'
-        mode:  0644
+        mode: '0644'
         force: true
       check_mode: true
       register: _pve_network_check
 
     - name: 'global task | set cluster network' # noqa no-handler conditional
       ansible.builtin.template:
-        src:   'interfaces.j2'
-        dest:  '/etc/network/interfaces.new'
+        src: 'interfaces.j2'
+        dest: '/etc/network/interfaces.new'
         owner: 'root'
         group: 'root'
-        mode:  0644
+        mode: '0644'
         force: true
       when: _pve_network_check.changed
-      notify: 'reboot pve'
+      notify: 'Reboot PVE'
 
     - name: 'global task | restarting node (may take a while)'
       ansible.builtin.debug:
@@ -47,5 +48,3 @@
 
           This will take a few minutes.
       when: _pve_network_check.changed
-
-  when: pve_interfaces|length > 0

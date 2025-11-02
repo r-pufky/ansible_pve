@@ -3,14 +3,14 @@
 
 - ansible.builtin.include_tasks: operations/delete.yml
   when: pve_destroy_hosts is defined
-  loop: '{{ pve_destroy_hosts|split(",")|map("trim") }}'
+  loop: '{{ pve_destroy_hosts | split(",") | map("trim") }}'
   loop_control:
     loop_var: destroy_host
 
-- name: 'provision LXC instances'
+- name: 'Provision LXC instances'
   ansible.builtin.include_tasks: provision.yml
   when: host.value.pve_lxc is defined
-  loop: '{{ hostvars|dict2items|flatten(levels=1) }}'
+  loop: '{{ hostvars | dict2items | flatten(levels=1) }}'
   loop_control:
     loop_var: host
   no_log: true # host_vars includes passwords

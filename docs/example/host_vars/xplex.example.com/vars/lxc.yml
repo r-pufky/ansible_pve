@@ -7,9 +7,9 @@
 # GPU passthru settings will be different for you. See role log from
 # provisioning for the exact values you need to use.
 pve_lxc:
-  vmid:       850
-  node:       'pm1.example.com'
-  template:   'debian-bullseye'
+  vmid: 850
+  node: 'pm1.example.com'
+  template: 'debian-bullseye'
   force_stop: true
   config: |
     # Plex Media Server container

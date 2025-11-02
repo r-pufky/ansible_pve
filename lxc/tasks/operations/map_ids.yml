@@ -14,28 +14,28 @@
 # * https://pve.proxmox.com/wiki/Unprivileged_LXC_containers
 # * https://pve.proxmox.com/pve-docs/pve-admin-guide.html
 
-- name: '{{ _pve_vm.vmid }} | mapping container uids (if needed)'
+- name: '{{ _pve_vm.vmid }} | mapping container uids (if needed)'  # noqa name[template]
   ansible.builtin.lineinfile:
-    path:   '/etc/subuid'
+    path: '/etc/subuid'
     regexp: '^{{ item }}'
-    line:   '{{ item }}'
-    owner:  'root'
-    group:  'root'
-    mode:   0644
-    state:  'present'
+    line: '{{ item }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+    state: 'present'
   loop: '{{ _pve_vm.lxc.meta.subuid }}'
   when: _pve_vm.lxc.meta.subuid|length > 0
   delegate_to: '{{ _pve_vm.node }}'
 
-- name: '{{ _pve_vm.vmid }} | mapping container gids (if needed)'
+- name: '{{ _pve_vm.vmid }} | mapping container gids (if needed)'  # noqa name[template]
   ansible.builtin.lineinfile:
-    path:   '/etc/subgid'
+    path: '/etc/subgid'
     regexp: '^{{ item }}'
-    line:   '{{ item }}'
-    owner:  'root'
-    group:  'root'
-    mode:   0644
-    state:  'present'
+    line: '{{ item }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+    state: 'present'
   loop: '{{ _pve_vm.lxc.meta.subgid }}'
   when: _pve_vm.lxc.meta.subgid|length > 0
   delegate_to: '{{ _pve_vm.node }}'

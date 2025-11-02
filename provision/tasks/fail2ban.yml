@@ -5,31 +5,31 @@
 # Install custom PVE fail2ban rules to /etc/fail2ban/{jail,filter}.d. This does
 # **NOT** manage the fail2ban service; that is intended for a separate role.
 
-- name: 'fail2ban | create rules directories'
+- name: 'Fail2ban | create rules directories'
   ansible.builtin.file:
-    path:  '{{ item }}'
+    path: '{{ item }}'
     owner: 'root'
     group: 'root'
-    mode:  '0755'
+    mode: '0755'
     state: 'directory'
   loop:
     - '/etc/fail2ban/jail.d'
     - '/etc/fail2ban/filter.d'
 
-- name: 'fail2ban | add custom jail'
+- name: 'Fail2ban | add custom jail'
   ansible.builtin.file:
-    src:   'fail2ban/jail.d/proxmox.conf'
-    path:  '/etc/fail2ban/jail.d/proxmox.conf'
+    src: 'fail2ban/jail.d/proxmox.conf'
+    path: '/etc/fail2ban/jail.d/proxmox.conf'
     owner: 'root'
     group: 'root'
-    mode:  '0755'
-    state: 'present'
+    mode: '0755'
+    state: 'file'
 
-- name: 'fail2ban | add custom filter'
+- name: 'Fail2ban | add custom filter'
   ansible.builtin.file:
-    src:   'fail2ban/filter.d/proxmox.conf'
-    path:  '/etc/fail2ban/filter.d/proxmox.conf'
+    src: 'fail2ban/filter.d/proxmox.conf'
+    path: '/etc/fail2ban/filter.d/proxmox.conf'
     owner: 'root'
     group: 'root'
-    mode:  '0755'
-    state: 'present'
+    mode: '0755'
+    state: 'file'

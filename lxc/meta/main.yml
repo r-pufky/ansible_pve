@@ -1,10 +1,10 @@
 ---
 galaxy_info:
-  author:      'r_pufky'
+  author: 'r_pufky'
   description: 'Proxmox (PVE) LXC Subrole'
-  company:     'N/A'
-  license:     'GPL-3.0-only'
-  min_ansible_version: 2.11
+  company: 'N/A'
+  license: 'GPL-3.0-only'
+  min_ansible_version: '2.11'
 
   platforms:
     - name: 'Debian'

@@ -36,42 +36,42 @@
 # * https://pve.proxmox.com/pve-docs/qm.1.html
 # * https://pve.proxmox.com/pve-docs/pve-admin-guide.html
 
-- name: '{{ host.value.pve_kvm.vmid }} | parse config'
+- name: '{{ host.value.pve_kvm.vmid }} | parse config'  # noqa name[template]
   kvm_config:
-    vmid:       '{{ host.value.pve_kvm.vmid }}'
-    node:       '{{ host.value.pve_kvm.node }}'
-    template:   '{{ pve_image_map[host.value.pve_kvm.template]|default(omit) }}'
-    force_stop: '{{ host.value.pve_kvm.force_stop|default(omit) }}'
-    cloud_init: '{{ host.value.pve_kvm.cloud_init|default(omit) }}'
-    firewall:   '{{ host.value.pve_lxc.firewall|default(omit) }}'
-    config:     '{{ host.value.pve_kvm.config  }}'
+    vmid: '{{ host.value.pve_kvm.vmid }}'
+    node: '{{ host.value.pve_kvm.node }}'
+    template: '{{ pve_image_map[host.value.pve_kvm.template] | default(omit) }}'
+    force_stop: '{{ host.value.pve_kvm.force_stop | default(omit) }}'
+    cloud_init: '{{ host.value.pve_kvm.cloud_init | default(omit) }}'
+    firewall: '{{ host.value.pve_lxc.firewall | default(omit) }}'
+    config: '{{ host.value.pve_kvm.config }}'
   register: _pve_vm
 
-- name: '{{ _pve_vm.vmid }} | set options'
+- name: '{{ _pve_vm.vmid }} | set options'  # noqa name[template]
   ansible.builtin.set_fact:
-    _pve_vm_exists:       false
-    _pve_vm_disk_resize:  false
+    _pve_vm_exists: false
+    _pve_vm_disk_resize: false
     _pve_cloud_init_disk: '{% if "tar" in _pve_vm.template.extension %}{{ pve_vm_disk_location }}/{{ _pve_vm.template.name }}.raw{% else %}{{ pve_vm_disk_location }}/{{ _pve_vm.template.name }}.{{ _pve_vm.root.format }}{% endif %}'
     _pve_cloud_init_disk_template: '{% if "tar" in _pve_vm.template.extension %}{{ pve_cloud_init_cache }}/{{ _pve_vm.template.name }}.raw{% else %}{{ pve_cloud_init_cache }}/{{ _pve_vm.template.name }}.{{ _pve_vm.root.format }}{% endif %}'
 
-- name: '{{ _pve_vm.vmid }} | determine cluster vm status'
+- name: '{{ _pve_vm.vmid }} | determine cluster vm status'  # noqa name[template]
   ansible.builtin.command: 'qm status {{ _pve_vm.vmid }}'
   changed_when: false
   register: _pve_cluster_vm_status
   failed_when: _pve_cluster_vm_status.rc not in (0, 2)
   delegate_to: '{{ _pve_vm.node }}'
 
-- name: '{{ _pve_vm.vmid }} | determine if vm exists'
+- name: '{{ _pve_vm.vmid }} | determine if vm exists'  # noqa name[template]
+  when: _pve_cluster_vm_status.rc == 0
   ansible.builtin.set_fact:
     _pve_vm_exists: true
-  when: _pve_cluster_vm_status.rc == 0
 
-- name: '{{ _pve_vm.vmid }} | ensure cloud init cache location exists'
+- name: '{{ _pve_vm.vmid }} | ensure cloud init cache location exists'  # noqa name[template]
+  when: _pve_vm.cloud_init|length > 0
   ansible.builtin.file:
-    path:  '{{ pve_cloud_init_cache }}'
+    path: '{{ pve_cloud_init_cache }}'
     owner: 'root'
     group: 'root'
-    mode:  0755
+    mode: '0755'
     state: 'directory'
   delegate_to: '{{ _pve_vm.node }}'
-  when: _pve_vm.cloud_init|length > 0

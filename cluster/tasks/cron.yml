@@ -5,29 +5,29 @@
 # Create custom cronjobs to execute on the PVE cluster node.
 #
 # Args:
-#   name: str cron job name (pve_cron.{JOB}).
+#   job: str cron job name (pve_cron.{JOB}).
 #   config: dict cron job configuration (pve_cron.{JOB}.*).
 
-- name: 'cron | set standard scheduling sync'
-  ansible.builtin.cron:
-    name:      'pve custom cron {{ name }}'
-    month:     '{{ config.month|default("*") }}'
-    weekday:   '{{ config.weekday|default("*") }}'
-    day:       '{{ config.day|default("*") }}'
-    hour:      '{{ config.hour|default("*") }}'
-    minute:    '{{ config.minute|default("*") }}'
-    user:      '{{ config.user }}'
-    job:       '{{ config.job }}'
-    cron_file: 'pve_custom_cron_{{ name }}'
-    state:     '{{ config.state|default("present") }}'
+- name: 'Cron | set standard scheduling sync'
   when: config.special_time is not defined
-
-- name: 'cron | set special time sync'
   ansible.builtin.cron:
-    name:         'pve custom cron {{ name }}'
-    special_time: '{{ config.special_time }}'
-    user:         '{{ config.user }}'
-    job:          '{{ config.job }}'
-    cron_file:    'pve_custom_cron_{{ name }}'
-    state:        '{{ config.state|default("present") }}'
+    name: 'pve custom cron {{ job }}'
+    month: '{{ config.month | default("*") }}'
+    weekday: '{{ config.weekday | default("*") }}'
+    day: '{{ config.day | default("*") }}'
+    hour: '{{ config.hour | default("*") }}'
+    minute: '{{ config.minute | default("*") }}'
+    user: '{{ config.user }}'
+    job: '{{ config.job }}'
+    cron_file: 'pve_custom_cron_{{ job }}'
+    state: '{{ config.state | default("present") }}'
+
+- name: 'Cron | set special time sync'
   when: config.special_time is defined
+  ansible.builtin.cron:
+    name: 'pve custom cron {{ job }}'
+    special_time: '{{ config.special_time }}'
+    user: '{{ config.user }}'
+    job: '{{ config.job }}'
+    cron_file: 'pve_custom_cron_{{ job }}'
+    state: '{{ config.state | default("present") }}'

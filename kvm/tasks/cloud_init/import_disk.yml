@@ -19,14 +19,14 @@
 # Reference:
 # * https://pve.proxmox.com/pve-docs/qm.1.html
 
-- name: '{{ _pve_vm.vmid }} import | importing root disk (this may take a while)'
+- name: '{{ _pve_vm.vmid }} import | importing root disk (this may take a while)'  # noqa name[template]
   ansible.builtin.debug:
     msg: |
       Importing: {{ _pve_vm.root.disk }}
 
 # Resize in create_disk; as this disk is imported but not mounted yet.
-- name: '{{ _pve_vm.vmid }} import | import cloud init disk to rootfs ({{ _pve_vm.root.disk }})' # noqa no-changed-when always execute
-  ansible.builtin.command: 'qm importdisk {{ _pve_vm.vmid }} "{{ _pve_cloud_init_disk }}" {{ _pve_vm.cloud_init.storage }}{% if _pve_vm.root.format|length > 0 %} --format {{ _pve_vm.root.format }}{% endif %}'
+- name: '{{ _pve_vm.vmid }} import | import cloud init disk to rootfs ({{ _pve_vm.root.disk }})' # noqa name[template] no-changed-when always execute
+  ansible.builtin.command: 'qm importdisk {{ _pve_vm.vmid }} "{{ _pve_cloud_init_disk }}" {{ _pve_vm.cloud_init.storage }}{% if _pve_vm.root.format | length > 0 %} --format {{ _pve_vm.root.format }}{% endif %}'
   delegate_to: '{{ _pve_vm.node }}'
 
 - ansible.builtin.import_tasks: roles/pve/kvm/tasks/operations/rescan.yml

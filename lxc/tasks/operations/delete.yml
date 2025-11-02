@@ -27,28 +27,30 @@
 # Reference:
 # * https://pve.proxmox.com/pve-docs/pct.1.html
 
-- name: 'delete | validate selected host {{ destroy_host }}'
+- name: 'Delete | validate selected host {{ destroy_host }}'
   ansible.builtin.assert:
     that:
       - destroy_host is defined
       - destroy_host in groups["all"]
 
-- name: 'delete | get host information {{ destroy_host }}'
+- name: 'Delete | get host information {{ destroy_host }}'
   ansible.builtin.set_fact:
     _pve_destroy_host: '{{ hostvars[destroy_host] }}'
 
-- name: 'delete | lxc host detected and validated'
+- name: 'Delete | lxc host detected and validated'
+  when: _pve_destroy_host.pve_lxc is defined
   block:
-    - name: 'delete lxc | get container config'
+    - name: 'Delete lxc | get container config'
       lxc_config:
-        vmid:       '{{ _pve_destroy_host.pve_lxc.vmid }}'
-        node:       '{{ _pve_destroy_host.pve_lxc.node }}'
-        template:   '{{ pve_image_map[_pve_destroy_host.pve_lxc.template]|default(omit) }}'
-        force_stop: '{{ _pve_destroy_host.pve_lxc.force_stop|default(omit) }}'
-        config:     '{{ _pve_destroy_host.pve_lxc.config  }}'
+        vmid: '{{ _pve_destroy_host.pve_lxc.vmid }}'
+        node: '{{ _pve_destroy_host.pve_lxc.node }}'
+        template: '{{ pve_image_map[_pve_destroy_host.pve_lxc.template] | default(omit) }}'
+        force_stop: '{{ _pve_destroy_host.pve_lxc.force_stop | default(omit) }}'
+        config: '{{ _pve_destroy_host.pve_lxc.config }}'
       register: _pve_destroy_config
 
-    - name: 'delete | DESTRUCTION WARNING'
+    - name: 'Delete | DESTRUCTION WARNING'
+      when: pve_destroy_pause
       ansible.builtin.debug:
         msg: |
           Manually halting execution for confirmation.
@@ -59,16 +61,14 @@
               * All container pve configuration files will be deleted.
               * NO mountpoints will be affected.
               * Container will be removed.
-      when: pve_destroy_pause
 
-    - name: 'delete | pause until manually confirmed'
+    - name: 'Delete | pause until manually confirmed'
+      when: pve_destroy_pause
       ansible.builtin.pause:
         echo: false
-      when: pve_destroy_pause
 
-    - name: 'delete | deleting {{ _pve_destroy.vmid }}/{{ _pve_destroy.config.hostname }}'
+    - name: 'Delete | deleting {{ _pve_destroy.vmid }}/{{ _pve_destroy.config.hostname }}'  # noqa name[template] no-changed-when
       ansible.builtin.command: 'pct destroy {{ _pve_destroy.vmid }} --force 1 --purge 1'
       delegate_to: '{{ _pve_destroy.node }}'
       register: _pve_destroy_results
       failed_when: _pve_destroy_results.rc not in (0, 2)
-  when: _pve_destroy_host.pve_lxc is defined

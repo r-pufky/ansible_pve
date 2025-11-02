@@ -33,28 +33,29 @@
 # * https://r-pufky.github.io/docs/virtualization/hypervisors/pve/index.html#firewall
 # * https://r-pufky.github.io/docs/virtualization/hypervisors/pve/index.html#ports
 
-- name: 'host firewall | set cluster node'
+- name: 'Host firewall | set cluster node'
   ansible.builtin.set_fact:
     _pve_cluster_firewall_host: '{{ host.split(".")[0] }}'
 
-- name: 'host firewall | {{ _pve_cluster_firewall_host }} check for changes' # noqa risky-file-permissions pmxcfs managed
+- name: 'Host firewall | {{ _pve_cluster_firewall_host }} check for changes' # noqa name[template] risky-file-permissions pmxcfs managed
   ansible.builtin.copy:
-    src:   'host.fw'
-    dest:  '/etc/pve/nodes/{{ _pve_cluster_firewall_host }}/host.fw'
+    src: 'host.fw'
+    dest: '/etc/pve/nodes/{{ _pve_cluster_firewall_host }}/host.fw'
     force: true
   check_mode: true
   register: _pve_node_firewall_check
 
-- name: 'host firewall | {{ _pve_cluster_firewall_host }} stage changes' # noqa no-handler conditional
+- name: 'Host firewall | {{ _pve_cluster_firewall_host }} stage changes' # noqa name[template] no-handler conditional
+  when: _pve_node_firewall_check.changed
   ansible.builtin.copy:
-    src:   'host.fw'
-    dest:  '/tmp/host.fw'
+    src: 'host.fw'
+    dest: '/tmp/host.fw'
     owner: 'root'
     group: 'www-data'
-    mode:  0640
+    mode: '0640'
     force: true
-  when: _pve_node_firewall_check.changed
 
-- name: 'host firewall | {{ _pve_cluster_firewall_host }} apply changes to pmxcfs' # noqa no-handler execute immediately
-  ansible.builtin.command: 'mv -f /tmp/host.fw /etc/pve/nodes/{{ _pve_cluster_firewall_host }}/host.fw'
+- name: 'Host firewall | {{ _pve_cluster_firewall_host }} apply changes to pmxcfs' # noqa name[template] no-handler execute immediately
   when: _pve_node_firewall_check.changed
+  ansible.builtin.command: 'mv -f /tmp/host.fw /etc/pve/nodes/{{ _pve_cluster_firewall_host }}/host.fw'
+  changed_when: false

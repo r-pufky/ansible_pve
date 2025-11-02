@@ -1,9 +1,9 @@
 ---
 galaxy_info:
-  author:      'r_pufky'
+  author: 'r_pufky'
   description: 'Proxmox (PVE) Cluster Subrole'
-  company:     'N/A'
-  license:     'AGPL-3.0 License'
+  company: 'N/A'
+  license: 'AGPL-3.0 License'
   min_ansible_version: 2.11
 
   platforms:

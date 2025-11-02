@@ -114,7 +114,7 @@ the ability to execute 'root' commands.
 site.yml
 ```yaml
 - name: 'PVE Ansible Configuration'
-  hosts:       'all'
+  hosts: 'all'
   remote_user: 'root'
   tasks:
     - name: 'PVE Ansible | init bare host with PVE role'
@@ -154,12 +154,12 @@ site.yml
   roles:
     # Commented roles are suggestions for additional things to do during
     # provisioning.
-    #- 'users'     # Your own custom users role.
-    #- 'sshd'      # Additional SSH customization
+    #- 'users' # Your own custom users role.
+    #- 'sshd' # Additional SSH customization
     #- 'wireguard' # Let's manage wireguard too.
-    #- 'zfs'       # ZFS as well.
-    #- 'nfs'       # NFS.
-    #- 'fail2ban'  # and install fail2ban role.
+    #- 'zfs' # ZFS as well.
+    #- 'nfs' # NFS.
+    #- 'fail2ban' # and install fail2ban role.
     - 'r_pufky.pve/provision'
   tags:
     - 'pve_provision'
@@ -191,7 +191,7 @@ done via the master cluster node, including:
   roles:
     # Commented roles are suggestions for additional things to do during
     # cluster configuration.
-    #- 'users'     # Your own custom users role.
+    #- 'users' # Your own custom users role.
     - 'r_pufky.pve/cluster'
   tags:
     - 'pve_cluster'
@@ -218,7 +218,7 @@ See [host_vars/xplex.example.com/lxc.yml](https://github.com/r-pufky/ansible_pve
   roles:
     # Commented roles are suggestions for additional things to do during
     # cluster configuration.
-    #- 'users'     # Your own custom users role.
+    #- 'users' # Your own custom users role.
     - 'r_pufky.pve/lxc'
   tags:
     - 'lxc'
@@ -232,7 +232,7 @@ See [host_vars/vtest.example.com/kvm.yml](https://github.com/r-pufky/ansible_pve
   roles:
     # Commented roles are suggestions for additional things to do during
     # cluster configuration.
-    #- 'users'     # Your own custom users role.
+    #- 'users' # Your own custom users role.
     - 'r_pufky.pve/kvm'
   tags:
     - 'kvm'

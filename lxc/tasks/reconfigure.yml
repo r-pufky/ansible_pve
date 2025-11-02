@@ -24,16 +24,16 @@
 # * https://pve.proxmox.com/pve-docs/chapter-pmxcfs.html
 # * https://forum.proxmox.com/threads/unable-to-modify-anything-under-etc-pve.10284/
 
-- name: '{{ _pve_vm.vmid }} | resize root disk if needed'
+- name: '{{ _pve_vm.vmid }} | resize root disk if needed'  # noqa name[template]
   ansible.builtin.include_tasks: operations/resize.yml
   vars:
     disk: '{{ _pve_vm.root.disk }}'
     size: '{{ _pve_vm.root.size }}'
 
-- name: '{{ _pve_vm.vmid }} | map container ids (if needed)'
+- name: '{{ _pve_vm.vmid }} | map container ids (if needed)'  # noqa name[template]
   ansible.builtin.include_tasks: operations/map_ids.yml
 
 # mv preserves permissions (not allowed on pmxcfs). cp & rm instead.
-- name: '{{ _pve_vm.vmid }} | apply configuration changes' # noqa no-changed-when always execute
+- name: '{{ _pve_vm.vmid }} | apply configuration changes' # noqa name[template] no-changed-when always execute
   ansible.builtin.shell: 'cp /tmp/lxc.conf /etc/pve/lxc/{{ _pve_vm.vmid }}.conf && rm /tmp/lxc.conf'
   delegate_to: '{{ _pve_vm.node }}'

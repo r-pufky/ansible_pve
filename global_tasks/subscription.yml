@@ -25,6 +25,7 @@
 # * https://r-pufky.github.io/docs/virtualization/hypervisors/pve/index.html#enable-automatic-non-subscription-updates
 
 - name: 'global task | configure subscriptions'
+  when: pve_subscription_keys | length > 0
   block:
     - name: 'global task | set subscription key for {{ inventory_hostname }}'
       ansible.builtin.shell: 'set -o pipefail && pvesubscription set "{{ pve_subscription_keys[inventory_hostname] }}"'
@@ -44,20 +45,19 @@
 
     - name: 'packages | remove non-subscription repo'
       ansible.builtin.apt_repository:
-        repo:  'deb https://enterprise.proxmox.com/debian/pve {{ pve_debian_base }} pve-no-subscription'
+        repo: 'deb https://enterprise.proxmox.com/debian/pve {{ pve_debian_base }} pve-no-subscription'
         state: 'absent'
         update_cache: true
 
     - name: 'packages | add enterprise (subscription) repo'
       ansible.builtin.apt_repository:
-        repo:     'deb http://download.proxmox.com/debian/pve {{ pve_debian_base }} pve-enterprise'
+        repo: 'deb http://download.proxmox.com/debian/pve {{ pve_debian_base }} pve-enterprise'
         filename: 'pve_non_subscription'
-        state:    'present'
+        state: 'present'
         update_cache: true
 
-  when: pve_subscription_keys|length > 0
-
 - name: 'global task | configure non-subscriptions'
+  when: pve_subscription_keys | length == 0
   block:
     - name: 'global task | remove subscription key for {{ inventory_hostname }}'
       ansible.builtin.shell: 'set -o pipefail && pvesubscription delete'
@@ -69,15 +69,13 @@
 
     - name: 'packages | remove enterprise (subscription) repo'
       ansible.builtin.apt_repository:
-        repo:  'deb https://enterprise.proxmox.com/debian/pve {{ pve_debian_base }} pve-enterprise'
+        repo: 'deb https://enterprise.proxmox.com/debian/pve {{ pve_debian_base }} pve-enterprise'
         state: 'absent'
         update_cache: true
 
     - name: 'packages | add non-subscription repo'
       ansible.builtin.apt_repository:
-        repo:     'deb http://download.proxmox.com/debian/pve {{ pve_debian_base }} pve-no-subscription'
+        repo: 'deb http://download.proxmox.com/debian/pve {{ pve_debian_base }} pve-no-subscription'
         filename: 'pve_non_subscription'
-        state:    'present'
+        state: 'present'
         update_cache: true
-
-  when: pve_subscription_keys|length == 0

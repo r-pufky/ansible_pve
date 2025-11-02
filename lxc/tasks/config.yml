@@ -28,28 +28,28 @@
 # * https://pve.proxmox.com/pve-docs/pct.1.html
 # * https://pve.proxmox.com/pve-docs/pve-admin-guide.html
 
-- name: '{{ host.value.pve_lxc.vmid }} | parse config'
+- name: '{{ host.value.pve_lxc.vmid }} | parse config'  # noqa name[template]
   lxc_config:
-    vmid:       '{{ host.value.pve_lxc.vmid }}'
-    node:       '{{ host.value.pve_lxc.node }}'
-    template:   '{{ pve_image_map[host.value.pve_lxc.template]|default(omit) }}'
-    force_stop: '{{ host.value.pve_lxc.force_stop|default(omit) }}'
-    firewall:   '{{ host.value.pve_lxc.firewall|default(omit) }}'
-    config:     '{{ host.value.pve_lxc.config  }}'
+    vmid: '{{ host.value.pve_lxc.vmid }}'
+    node: '{{ host.value.pve_lxc.node }}'
+    template: '{{ pve_image_map[host.value.pve_lxc.template] | default(omit) }}'
+    force_stop: '{{ host.value.pve_lxc.force_stop | default(omit) }}'
+    firewall: '{{ host.value.pve_lxc.firewall | default(omit) }}'
+    config: '{{ host.value.pve_lxc.config }}'
   register: _pve_vm
 
-- name: '{{ _pve_vm.vmid }} | set options'
+- name: '{{ _pve_vm.vmid }} | set options'  # noqa name[template]
   ansible.builtin.set_fact:
     _pve_vm_exists: false
 
-- name: '{{ _pve_vm.vmid }} | determine cluster vm status'
+- name: '{{ _pve_vm.vmid }} | determine cluster vm status'  # noqa name[template]
   ansible.builtin.command: 'pct status {{ _pve_vm.vmid }}'
   changed_when: false
   register: _pve_cluster_vm_status
   failed_when: _pve_cluster_vm_status.rc not in (0, 2)
   delegate_to: '{{ _pve_vm.node }}'
 
-- name: '{{ _pve_vm.vmid }} | determine if container exists'
+- name: '{{ _pve_vm.vmid }} | determine if container exists'  # noqa name[template]
+  when: _pve_cluster_vm_status.rc == 0
   ansible.builtin.set_fact:
     _pve_vm_exists: true
-  when: _pve_cluster_vm_status.rc == 0

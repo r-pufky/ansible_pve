@@ -13,5 +13,6 @@
 # Reference:
 # * https://pve.proxmox.com/wiki/User_Management
 
-- name: 'email | send cluster root email to {{ pve_root_email }}' # noqa no-changed-when always execute
+- name: 'Email | send cluster root email to {{ pve_root_email }}' # noqa no-changed-when always execute
   ansible.builtin.command: 'pveum user modify root@pam -email {{ pve_root_email }}'
+  changed_when: false

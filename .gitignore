@@ -3,3 +3,13 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.swp
+
+# ansible builds
+r_pufky-*.tar.gz
+.ansible/
+.ansible
+.vscode/
+molecule/cache
+COMMIT.md
+TODO.md
+

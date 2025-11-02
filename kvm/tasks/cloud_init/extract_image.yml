@@ -17,43 +17,43 @@
 # * https://pve.proxmox.com/pve-docs/qm.1.html
 # * https://linux.die.net/man/1/qemu-img
 
-- name: '{{ _pve_vm.vmid }} cloud init | check if previously extracted'
+- name: '{{ _pve_vm.vmid }} cloud init | check if previously extracted'  # noqa name[template]
   ansible.builtin.stat:
     path: '{{ _pve_cloud_init_disk }}'
-    get_checksum:   false
+    get_checksum: false
     get_attributes: false
-    get_mime:       false
+    get_mime: false
   register: _pve_extracted_disk
   delegate_to: '{{ _pve_vm.node }}'
 
-- name: '{{ _pve_vm.vmid }} cloud init | extracting template image'
+- name: '{{ _pve_vm.vmid }} cloud init | extracting template image'  # noqa name[template]
+  when: |
+    _pve_vm.template.extension == 'tar.xz' and
+    not _pve_extracted_disk.stat.exists
   block:
-    - name: '{{ _pve_vm.vmid }} cloud init | extracting (this may take a while)'
+    - name: '{{ _pve_vm.vmid }} cloud init | extracting (this may take a while)'  # noqa name[template]
       ansible.builtin.debug:
         msg: |
           Extracting: {{ _pve_vm.template.file }}
 
-    - name: '{{ _pve_vm.vmid }} cloud init | extracting image'
+    - name: '{{ _pve_vm.vmid }} cloud init | extracting image'  # noqa name[template]
       ansible.builtin.unarchive:
-        src:        '{{ pve_cloud_init_cache }}/{{ _pve_vm.template.file }}'
+        src: '{{ pve_cloud_init_cache }}/{{ _pve_vm.template.file }}'
         remote_src: true
-        dest:       '{{ pve_cloud_init_cache }}'
-        include:    'disk.raw'
-        owner:      'root'
-        group:      'root'
-        mode:       0644
+        dest: '{{ pve_cloud_init_cache }}'
+        include: 'disk.raw'
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
       delegate_to: '{{ _pve_vm.node }}'
 
-    - name: '{{ _pve_vm.vmid }} cloud init | stage cloud init image'
+    - name: '{{ _pve_vm.vmid }} cloud init | stage cloud init image'  # noqa name[template] no-changed-when
       ansible.builtin.command: 'mv "{{ pve_cloud_init_cache }}/disk.raw" "{{ _pve_cloud_init_disk }}"'
       delegate_to: '{{ _pve_vm.node }}'
-  when: |
-    _pve_vm.template.extension == 'tar.xz' and
-    not _pve_extracted_disk.stat.exists
 
-- name: '{{ _pve_vm.vmid }} cloud init | converting cloud init image to target format'
-  ansible.builtin.command: 'qemu-img convert -f {{ _pve_vm.template.extension }} -O {{ _pve_vm.root.format }} "{{ _pve_cloud_init_disk_template }}" "{{ _pve_cloud_init_disk }}"'
-  delegate_to: '{{ _pve_vm.node }}'
+- name: '{{ _pve_vm.vmid }} cloud init | converting cloud init image to target format'  # noqa name[template] no-changed-when
   when: |
     _pve_vm.template.extension != 'tar.xz' and
     not _pve_extracted_disk.stat.exists
+  ansible.builtin.command: 'qemu-img convert -f {{ _pve_vm.template.extension }} -O {{ _pve_vm.root.format }} "{{ _pve_cloud_init_disk_template }}" "{{ _pve_cloud_init_disk }}"'
+  delegate_to: '{{ _pve_vm.node }}'

@@ -15,27 +15,27 @@
 
 # Use default or first available IP address of the target machine.
 # Reference: https://medium.com/opsops/ansible-default-ipv4-is-not-what-you-think-edb8ab154b10
-- name: 'create cluster | set server connected ip'
+- name: 'Create cluster | set server connected ip'  # noqa name[template]
   ansible.builtin.set_fact:
-    _pve_host_ip: '{{ ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }}'
+    _pve_host_ip: '{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}'
 
-- name: 'create cluster | check server cluster status'
+- name: 'Create cluster | check server cluster status'  # noqa name[template]
   ansible.builtin.command: 'pvecm status'
   changed_when: false
   register: _cluster_check
   failed_when: _cluster_check.rc > 2
 
-- name: 'create cluster | flush handler states'
+- name: 'Create cluster | flush handler states'  # noqa name[template]
   ansible.builtin.meta: flush_handlers
 
-- name: 'create cluster | create cluster'
+- name: 'Create cluster | create cluster'  # noqa name[template] no-changed-when
   ansible.builtin.command: 'pvecm create {{ pve_cluster_name }}'
   when: |
     _cluster_check.rc == 2 and
     _pve_host_ip == pve_master_node_ip
 
 # expect: enter password, accept host fingerprints
-- name: 'create cluster | add to cluster'
+- name: 'Create cluster | add to cluster'  # noqa name[template]
   ansible.builtin.expect:
     command: 'pvecm add {{ pve_master_node_ip }}'
     responses:
@@ -49,7 +49,7 @@
     _pve_host_ip != pve_master_node_ip and
     _pve_host_ip in pve_node_ips
 
-- name: 'create cluster | verify cluster created'
+- name: 'Create cluster | verify cluster created'  # noqa name[template]
   ansible.builtin.command: 'pvecm status'
   changed_when: false
   register: _cluster_verify

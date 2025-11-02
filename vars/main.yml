@@ -5,11 +5,11 @@
 # Default required packages for PVE install.
 
 pve_core_packages:
-  - 'sudo'                # sudo usage with ansible.
-  - 'vim'                 # sane minimal editor.
-  - 'python3-pexpect'     # password expect usage on cluster setup.
-  - 'ifupdown2'           # bonded bridges on PVE 7 (not installed by default).
-  - 'xz-utils'            # For manual debian package installs.
+  - 'sudo' # sudo usage with ansible.
+  - 'vim' # sane minimal editor.
+  - 'python3-pexpect' # password expect usage on cluster setup.
+  - 'ifupdown2' # bonded bridges on PVE 7 (not installed by default).
+  - 'xz-utils' # For manual debian package installs.
 
 ###############################################################################
 # Default PVE Base Debian Release

@@ -14,7 +14,7 @@
 # * https://github.com/arkalira/Deploying-VMs-to-Proxmox-using-cloud-init
 # * https://pve.proxmox.com/wiki/Cloud-Init_Support
 
-- name: '{{ _pve_vm.vmid }} cloud init | check if {{ _pve_vm.template.name }} exists'
+- name: '{{ _pve_vm.vmid }} cloud init | check if {{ _pve_vm.template.name }} exists'  # noqa name[template]
   ansible.builtin.stat:
     path: '{{ pve_cloud_init_cache }}/{{ _pve_vm.template.file }}'
     get_checksum:   false
@@ -23,20 +23,20 @@
   register: _pve_template
   delegate_to: '{{ _pve_vm.node }}'
 
-- name: '{{ _pve_vm.vmid }} cloud init | downloading (timeout after {{ pve_vm_download_timeout }} seconds)'
+- name: '{{ _pve_vm.vmid }} cloud init | downloading (timeout after {{ pve_vm_download_timeout }} seconds)'  # noqa name[template]
+  when: not _pve_template.stat.exists
   ansible.builtin.debug:
     msg: |
       Downloading: {{ _pve_vm.template.file }}
-  when: not _pve_template.stat.exists
 
-- name: '{{ _pve_vm.vmid }} cloud init | cluster {{ _pve_vm.node }} downloading: {{ _pve_vm.template.name }}'
-  ansible.builtin.get_url:
-    url:      '{{ _pve_vm.template.url }}'
-    dest:     '{{ pve_cloud_init_cache }}/{{ _pve_vm.template.file }}'
-    checksum: '{{ _pve_vm.template.algorithm }}:{{ _pve_vm.template.checksum }}'
-    timeout:  '{{ pve_vm_download_timeout }}'
-    owner:    'root'
-    group:    'root'
-    mode:     0755
-  delegate_to: '{{ _pve_vm.node }}'
+- name: '{{ _pve_vm.vmid }} cloud init | cluster {{ _pve_vm.node }} downloading: {{ _pve_vm.template.name }}'  # noqa name[template]
   when: not _pve_template.stat.exists
+  ansible.builtin.get_url:
+    url: '{{ _pve_vm.template.url }}'
+    dest: '{{ pve_cloud_init_cache }}/{{ _pve_vm.template.file }}'
+    checksum: '{{ _pve_vm.template.algorithm }}:{{ _pve_vm.template.checksum }}'
+    timeout: '{{ pve_vm_download_timeout }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+  delegate_to: '{{ _pve_vm.node }}'

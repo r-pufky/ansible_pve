@@ -28,24 +28,24 @@
 # Reference:
 # * https://cloudinit.readthedocs.io/en/latest/index.html
 
-- name: '{{ _pve_vm.vmid }} create | stage ssh keys'
+- name: '{{ _pve_vm.vmid }} create | stage ssh keys'  # noqa name[template]
   ansible.builtin.template:
-    src:   'file.template.j2'
-    dest:  '/tmp/{{ _pve_vm.vmid }}.ssh.key'
+    src: 'file.template.j2'
+    dest: '/tmp/{{ _pve_vm.vmid }}.ssh.key'
     force: true
     owner: 'root'
     group: 'root'
-    mode:  0640
+    mode: '0640'
   vars:
     file_contents: '{{ _pve_vm.ssh_keys }}'
 
-- name: '{{ _pve_vm.vmid }} create | import ssh keys' # noqa no-changed-when always execute
+- name: '{{ _pve_vm.vmid }} create | import ssh keys' # noqa name[template] no-changed-when always execute
   ansible.builtin.command: 'qm set {{ _pve_vm.vmid }} --sshkeys /tmp/{{ _pve_vm.vmid }}.ssh.key'
   delegate_to: '{{ _pve_vm.node }}'
 
-- name: '{{ _pve_vm.vmid }} create | cleanup ssh keys' # noqa ignore-errors ok if missing
+- name: '{{ _pve_vm.vmid }} create | cleanup ssh keys' # noqa name[template] ignore-errors ok if missing
   ansible.builtin.file:
-    path:  '/tmp/{{ _pve_vm.vmid }}.ssh.key'
+    path: '/tmp/{{ _pve_vm.vmid }}.ssh.key'
     state: 'absent'
   changed_when: false
   ignore_errors: true

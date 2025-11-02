@@ -33,22 +33,22 @@
 
 - name: '{{ _pve_vm.vmid }} | check for firewall changes' # noqa risky-file-permissions pmxcfs managed
   ansible.builtin.template:
-    src:   'vmid.fw.j2'
-    dest:  '/etc/pve/firewall/{{ _pve_vm.vmid }}.fw'
+    src: 'vmid.fw.j2'
+    dest: '/etc/pve/firewall/{{ _pve_vm.vmid }}.fw'
     force: true
   check_mode: true
   register: _pve_vm_firewall_check
 
 - name: '{{ _pve_vm.vmid }} | stage firewall changes' # noqa no-handler conditional
+  when: _pve_vm_firewall_check.changed
   ansible.builtin.template:
-    src:   'vmid.fw.j2'
-    dest:  '/tmp/{{ _pve_vm.vmid }}.fw'
+    src: 'vmid.fw.j2'
+    dest: '/tmp/{{ _pve_vm.vmid }}.fw'
     owner: 'root'
     group: 'www-data'
-    mode:  0640
+    mode: '0640'
     force: true
-  when: _pve_vm_firewall_check.changed
 
 - name: '{{ _pve_vm.vmid }} | apply firewall changes to pmxcfs' # noqa no-handler execute immediately
-  ansible.builtin.command: 'mv /tmp/{{ _pve_vm.vmid }}.fw /etc/pve/firewall/{{ _pve_vm.vmid }}.fw'
   when: _pve_vm_firewall_check.changed
+  ansible.builtin.command: 'mv /tmp/{{ _pve_vm.vmid }}.fw /etc/pve/firewall/{{ _pve_vm.vmid }}.fw'
